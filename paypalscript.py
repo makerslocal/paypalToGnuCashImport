@@ -1,23 +1,16 @@
+#!/usr/bin/env python3
 import csv
-ldate = ["Date"]
-lname = ["Name"]
-lammo = ["Ammount"]
-ldesc = ["Description"]
-with open("Paypal Export.CSV", 'r', encoding="utf-8-sig") as filein:
-    csv_filein = csv.DictReader(filein)
-    for rowi in csv_filein:
-        if rowi["Balance Impact"] == "Credit":
-            ldate.append(rowi["Date"])
-            lname.append(rowi["Name"])
-            lammo.append(rowi["Net"])
-            ldesc.append(rowi["Type"])
+
+mapping = {"Date": "Date", "Name": "Name", "Amount": "Net", "Description": "Type"}
+
+def strip_row(row):
+    return {k: row[v] for k,v in mapping.items()}
+
+with open("Paypal Export.csv", 'r', encoding="utf-8-sig") as filein:
+    csv_filein = [strip_row(row) for row in csv.DictReader(filein) if row["Balance Impact"] == "Credit"]
+    with open('output.csv', 'w', newline='') as fileout:
+        writer = csv.DictWriter(fileout, fieldnames=mapping.keys())
+        writer.writeheader()
+        [writer.writerow(row) for row in csv_filein]
+        fileout.close()
     filein.close()
-
-
-with open('output.csv', 'w', newline='') as fileout:
-    writer = csv.writer(fileout)
-    rcount = 0
-    for row in ldate:
-        writer.writerow((ldate[rcount], lname[rcount], lammo[rcount], ldesc[rcount]))
-        rcount = rcount + 1
-    fileout.close()
