@@ -1,6 +1,31 @@
 #!/usr/bin/env python3
 import argparse
 import csv
+import os.path
+
+#
+# Parse and set Input and Output Files
+#
+
+parser = argparse.ArgumentParser(description='Takes a PayPal CSV export file and generates a GnuCash formatted CSV import file.  Default input file name is Paypal Export.csv.  Defaults output file name is output.csv')
+parser.add_argument('-i','--input', help='Input file name', nargs="?", default="Paypal Export.csv", type=str)
+parser.add_argument('-o','--output',help='Output file name', nargs="?", default="Output.csv", type=str)
+args = parser.parse_args()
+
+inputFile = args.input
+
+if not os.path.exists(inputFile.strip('\n')):
+    print("Input file does not exist: " + inputFile)
+    quit()
+
+print("Input File:  " + inputFile)    
+
+outputFile = args.output
+print("Output File: " + outputFile)
+
+#
+# Parse input file and create output file
+#
 
 
 class PayPalConverter:
