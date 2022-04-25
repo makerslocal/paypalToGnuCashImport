@@ -8,13 +8,11 @@ import os.path
 #
 
 parser = argparse.ArgumentParser(description='Takes a PayPal CSV export file and generates a GnuCash formatted CSV import file.  Default input file name is Paypal Export.csv.  Defaults output file name is output.csv')
-parser.add_argument('-i','--input', help='Input file name',required=False)
-parser.add_argument('-o','--output',help='Output file name', required=False)
+parser.add_argument('-i','--input', help='Input file name', nargs="?", default="Paypal Export.csv", type=str)
+parser.add_argument('-o','--output',help='Output file name', nargs="?", default="Output.csv", type=str)
 args = parser.parse_args()
 
 inputFile = args.input
-if not bool(inputFile):
-    inputFile = 'Paypal Export.csv'
 
 if not os.path.exists(inputFile.strip('\n')):
     print("Input file does not exist: " + inputFile)
@@ -23,9 +21,6 @@ if not os.path.exists(inputFile.strip('\n')):
 print("Input File:  " + inputFile)    
 
 outputFile = args.output
-if not bool(outputFile):    
-    outputFile = "Output.csv"
-
 print("Output File: " + outputFile)
 
 #
