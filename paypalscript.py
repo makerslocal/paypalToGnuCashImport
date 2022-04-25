@@ -11,6 +11,4 @@ with open("Paypal Export.csv", 'r', encoding="utf-8-sig") as filein:
     with open('output.csv', 'w', newline='') as fileout:
         writer = csv.DictWriter(fileout, fieldnames=mapping.keys())
         writer.writeheader()
-        [writer.writerow(row) for row in csv_filein]
-        fileout.close()
-    filein.close()
+        writer.writerows(csv_filein)
