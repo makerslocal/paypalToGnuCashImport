@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import csv
+from datetime import datetime
 
 
 class PayPalConverter:
@@ -27,6 +28,13 @@ class PayPalConverter:
         except FileNotFoundError:
             exit(f"File { self.in_file } not found")
 
+    def validate(self, validation_date):
+        for row in self.data:
+            date_time_obj = datetime.strptime(row["Date"], '%m/%d/%y')
+            if date_time_obj <= validation_date:
+                print(f'Row removed')
+                self.data.remove(row)
+
     def write(self):
         with open(self.out_file, 'w', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.mapping.keys())
@@ -40,12 +48,16 @@ if __name__ == '__main__':
                                                  'Defaults output file name is Output.csv')
     parser.add_argument('-i', '--input', default='Paypal Export.csv', help='Input file name')
     parser.add_argument('-o', '--output', default='Output.csv', help='Output file name')
+    parser.add_argument('-d', '--date', required=True, help='Ignore entries including and before this date (mm/dd/yy)',
+                        type=lambda s: datetime.strptime(s, '%m/%d/%y'))
     args = parser.parse_args()
 
     print(f'Input File: { args.input }')
     print(f'Output File: { args.output }')
+    print(f'Ignore On or Before Date: { args.date }')
 
     # Parse input file and create output file
     converter = PayPalConverter(in_file=args.input, out_file=args.output)
     converter.read()
+    converter.validate(args.date)
     converter.write()
