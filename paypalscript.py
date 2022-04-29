@@ -30,12 +30,14 @@ class PayPalConverter:
             exit(f"File { self.in_file } not found")
 
     def validate(self, validation_date):
+        validated_data = []
         for row in self.data:
-            print("THIS HERE DATE: " + row["Date"])
             date_time_obj = datetime.strptime(row["Date"], "%m/%d/%Y")
             if date_time_obj <= validation_date:
-                print(f'Row removed')
-                self.data.remove(row)
+                print(f'Ignoring Row for Date ' + row["Date"] + ' for contributor ' + row["Name"])
+            else:
+                validated_data.append(row)
+        self.data = validated_data
 
     def write(self):
         with open(self.out_file, 'w', newline='') as f:
@@ -50,7 +52,7 @@ if __name__ == '__main__':
                                                  'Defaults output file name is Output.csv')
     parser.add_argument('-i', '--input', default='Paypal Export.csv', help='Input file name')
     parser.add_argument('-o', '--output', default='Output.csv', help='Output file name')
-    parser.add_argument('-d', '--date', required=True, help='Ignore entries including and before this date (mm/dd/yy)',
+    parser.add_argument('-d', '--date', required=True, help='Ignore entries including and before this date (mm/dd/yyyy)',
                         type=lambda s: datetime.strptime(s, "%m/%d/%Y"))
     args = parser.parse_args()
 
