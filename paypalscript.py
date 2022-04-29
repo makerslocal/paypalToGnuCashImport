@@ -2,6 +2,7 @@
 import argparse
 import csv
 from datetime import datetime
+from datetime import date
 
 
 class PayPalConverter:
@@ -30,7 +31,8 @@ class PayPalConverter:
 
     def validate(self, validation_date):
         for row in self.data:
-            date_time_obj = datetime.strptime(row["Date"], '%m/%d/%y')
+            print("THIS HERE DATE: " + row["Date"])
+            date_time_obj = datetime.strptime(row["Date"], "%m/%d/%Y")
             if date_time_obj <= validation_date:
                 print(f'Row removed')
                 self.data.remove(row)
@@ -49,7 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input', default='Paypal Export.csv', help='Input file name')
     parser.add_argument('-o', '--output', default='Output.csv', help='Output file name')
     parser.add_argument('-d', '--date', required=True, help='Ignore entries including and before this date (mm/dd/yy)',
-                        type=lambda s: datetime.strptime(s, '%m/%d/%y'))
+                        type=lambda s: datetime.strptime(s, "%m/%d/%Y"))
     args = parser.parse_args()
 
     print(f'Input File: { args.input }')
