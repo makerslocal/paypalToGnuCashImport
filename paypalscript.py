@@ -10,7 +10,7 @@ class PayPalConverter:
     Parses Paypal csv files into something GNUCash can read
     """
     data = []
-    mapping = {'Date': 'Date', 'Name': 'Name', 'Amount': 'Net', 'Description': 'Type'}
+    mapping = {'Date': 'Date', 'Time': 'Time', 'Name': 'Name', 'Amount': 'Net', 'Description': 'Type'}
     paypal_header = 'Balance Impact'
     balance_type = 'Credit'
 
@@ -32,9 +32,9 @@ class PayPalConverter:
     def validate(self, validation_date):
         validated_data = []
         for row in self.data:
-            date_time_obj = datetime.strptime(row["Date"], "%m/%d/%Y")
+            date_time_obj = datetime.strptime(row["Date"] + " " + row["Time"], "%m/%d/%Y %H:%M:%S")
             if date_time_obj <= validation_date:
-                print(f'Ignoring Row for Date ' + row["Date"] + ' for contributor ' + row["Name"])
+                print(f'Ignoring Row for Date ' + row["Date"] + ' ' + row["Time"] + ' for contributor ' + row["Name"])
             else:
                 validated_data.append(row)
         self.data = validated_data
@@ -52,8 +52,9 @@ if __name__ == '__main__':
                                                  'Defaults output file name is Output.csv')
     parser.add_argument('-i', '--input', default='Paypal Export.csv', help='Input file name')
     parser.add_argument('-o', '--output', default='Output.csv', help='Output file name')
-    parser.add_argument('-d', '--date', required=True, help='Ignore entries including and before this date (mm/dd/yyyy)',
-                        type=lambda s: datetime.strptime(s, "%m/%d/%Y"))
+    parser.add_argument('-d', '--date', required=True, help='Ignore entries including and before this date ('
+                                                            'mm/dd/yyyy hh/mm/ss)',
+                        type=lambda s: datetime.strptime(s, "%m/%d/%Y %H:%M:%S"))
     args = parser.parse_args()
 
     print(f'Input File: { args.input }')
