@@ -32,8 +32,8 @@ class PayPalConverter:
         except FileNotFoundError:
             exit(f"File { self.in_file } not found")
 
-    def _convert_datetime(self, d, t):
-        return datetime.strptime(f'{ d } { t }', "%m/%d/%Y %H:%M:%S")
+    def _convert_datetime(self, date, time):
+        return datetime.strptime(f'{ date } { time }', "%m/%d/%Y %H:%M:%S")
 
     def write(self):
         with open(self.out_file, 'w', newline='') as f:
