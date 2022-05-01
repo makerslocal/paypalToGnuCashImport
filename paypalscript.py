@@ -2,7 +2,6 @@
 import argparse
 import csv
 from datetime import datetime
-from datetime import date
 
 
 class PayPalConverter:
@@ -10,13 +9,15 @@ class PayPalConverter:
     Parses Paypal csv files into something GNUCash can read
     """
     data = []
+    ignore_datetime = None
     mapping = {'Date': 'Date', 'Time': 'Time', 'Name': 'Name', 'Amount': 'Net', 'Description': 'Type'}
     paypal_header = 'Balance Impact'
     balance_type = 'Credit'
 
-    def __init__(self, in_file, out_file):
+    def __init__(self, in_file, out_file, ignore_datetime):
         self.in_file = in_file
         self.out_file = out_file
+        self.ignore_datetime = ignore_datetime
 
     def _strip_row(self, row):
         return {k: row[v] for k, v in self.mapping.items()}
@@ -26,18 +27,13 @@ class PayPalConverter:
             with open(self.in_file, 'r', encoding='utf-8-sig') as f:
                 self.data = [self._strip_row(row) for row in csv.DictReader(f) if row[self.paypal_header] ==
                              self.balance_type]
+                self.data = filter(lambda d: self._convert_datetime(d['Date'], d['Time']) > self.ignore_datetime,
+                                   self.data)
         except FileNotFoundError:
             exit(f"File { self.in_file } not found")
 
-    def validate(self, validation_date):
-        validated_data = []
-        for row in self.data:
-            date_time_obj = datetime.strptime(row["Date"] + " " + row["Time"], "%m/%d/%Y %H:%M:%S")
-            if date_time_obj <= validation_date:
-                print(f'Ignoring Row for Date ' + row["Date"] + ' ' + row["Time"] + ' for contributor ' + row["Name"])
-            else:
-                validated_data.append(row)
-        self.data = validated_data
+    def _convert_datetime(self, d, t):
+        return datetime.strptime(f'{ d } { t }', "%m/%d/%Y %H:%M:%S")
 
     def write(self):
         with open(self.out_file, 'w', newline='') as f:
@@ -62,7 +58,6 @@ if __name__ == '__main__':
     print(f'Ignore On or Before Date: { args.date }')
 
     # Parse input file and create output file
-    converter = PayPalConverter(in_file=args.input, out_file=args.output)
+    converter = PayPalConverter(in_file=args.input, out_file=args.output, ignore_datetime=args.date)
     converter.read()
-    converter.validate(args.date)
     converter.write()
