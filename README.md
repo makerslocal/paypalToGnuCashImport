@@ -45,6 +45,7 @@ How To Use This
 24. Click Next
 25. When the Match screen comes up, make sure all are checked as "A" for add
 
+
 Known Issues
 -----------
 After the last step, some mappings may come back colored red.  So far accepting them has not resulted in errors, but GnuCash
